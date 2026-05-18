@@ -1,6 +1,57 @@
 [
   {
-    "input": { "password": "a" },
-    "expected": { "score": 0 }
+    "description": "empty string → weakest score",
+    "input": { "password": "" },
+    "expected": { "score": 0, "crackTimeTier": "t0" }
+  },
+  {
+    "description": "whitespace-only input",
+    "input": { "password": "   " },
+    "expected": { "score": 0, "crackTimeTier": "t0" }
+  },
+  {
+    "description": "top common password",
+    "input": { "password": "password" },
+    "expected": { "score": 0, "crackTimeTier": "t0" }
+  },
+  {
+    "description": "keyboard walk",
+    "input": { "password": "qwerty" },
+    "expected": { "score": 0, "crackTimeTier": "t0" }
+  },
+  {
+    "description": "long repeats",
+    "input": { "password": "aaaaaaaaaaaaaaaa" },
+    "expected": { "score": 0, "crackTimeTier": "t0" }
+  },
+  {
+    "description": "short numeric PIN",
+    "input": { "password": "1234" },
+    "expected": { "score": 0, "crackTimeTier": "t0" }
+  },
+  {
+    "description": "mid-strength random mixed (score 2, brute-force only)",
+    "input": { "password": "pJ5&wR3" },
+    "expected": { "score": 2, "crackTimeTier": "t2" }
+  },
+  {
+    "description": "mid-strength random lowercase (score 3, brute-force only)",
+    "input": { "password": "mxqpzrvbk" },
+    "expected": { "score": 3, "crackTimeTier": "t3" }
+  },
+  {
+    "description": "unicode passphrase (non-ASCII)",
+    "input": { "password": "contraseña-fuerte-y-única" },
+    "expected": { "score": 4, "crackTimeTier": "t5" }
+  },
+  {
+    "description": "strong passphrase with spaces",
+    "input": { "password": "correct horse battery staple" },
+    "expected": { "score": 4, "crackTimeTier": "t5" }
+  },
+  {
+    "description": "high-entropy random string",
+    "input": { "password": "X9#kL2$mP7!qR4&vW8" },
+    "expected": { "score": 4, "crackTimeTier": "t5" }
   }
 ]

@@ -1,13 +1,84 @@
-export interface StrengthResult {
-  score: 0 | 1 | 2 | 3 | 4;
-  crackTimeSeconds: number;
-  crackTimeDisplay: string;
+import { zxcvbn } from "@zxcvbn-ts/core";
+import { ensureOptionsLoaded } from "./options.js";
+
+/**
+ * Maximum password length accepted by the strength engine.
+ *
+ * Rationale:
+ * - zxcvbn scoring cost grows super-linearly with input length; inputs beyond
+ *   ~100 chars cause noticeable latency with no meaningful scoring benefit.
+ * - The downstream HIBP k-anonymity check hashes the full input, so length is
+ *   irrelevant there, but keeping a bound prevents abuse of the analysis path.
+ * - 128 is a generous upper bound that covers any real-world passphrase while
+ *   still capping worst-case computation.
+ */
+export const MAX_PASSWORD_LENGTH = 128;
+
+/** Crack-time scenario names matching zxcvbn-ts output keys. */
+export interface CrackTimesSeconds {
+  onlineThrottling: number;
+  onlineNoThrottling: number;
+  offlineSlowHashing: number;
+  offlineFastHashing: number;
 }
 
-export function evaluateStrength(_password: string): StrengthResult {
+export interface StrengthResult {
+  score: 0 | 1 | 2 | 3 | 4;
+  guesses: number;
+  crackTimesSeconds: CrackTimesSeconds;
+  /** Raw zxcvbn feedback — Phase 2 owns transformation into actionable UI feedback. */
+  rawFeedback: {
+    warning: string | null;
+    suggestions: string[];
+  };
+}
+
+export function evaluateStrength(password: string): StrengthResult {
+  if (typeof password !== "string") {
+    throw new TypeError("password must be a string");
+  }
+
+  if (password.length === 0) {
+    return {
+      score: 0,
+      guesses: 0,
+      crackTimesSeconds: {
+        onlineThrottling: 0,
+        onlineNoThrottling: 0,
+        offlineSlowHashing: 0,
+        offlineFastHashing: 0,
+      },
+      rawFeedback: { warning: null, suggestions: [] },
+    };
+  }
+
+  // Reject passwords exceeding the length cap. Truncation would silently
+  // change the scored value, so we reject to fail loud per CLAUDE.md.
+  if (password.length > MAX_PASSWORD_LENGTH) {
+    throw new RangeError(
+      `password exceeds maximum length of ${MAX_PASSWORD_LENGTH} characters`,
+    );
+  }
+
+  ensureOptionsLoaded();
+
+  const result = zxcvbn(password);
+
   return {
-    score: 0,
-    crackTimeSeconds: 0,
-    crackTimeDisplay: "instant",
+    score: result.score as 0 | 1 | 2 | 3 | 4,
+    guesses: result.guesses,
+    crackTimesSeconds: {
+      onlineThrottling: result.crackTimesSeconds.onlineThrottling100PerHour,
+      onlineNoThrottling:
+        result.crackTimesSeconds.onlineNoThrottling10PerSecond,
+      offlineSlowHashing:
+        result.crackTimesSeconds.offlineSlowHashing1e4PerSecond,
+      offlineFastHashing:
+        result.crackTimesSeconds.offlineFastHashing1e10PerSecond,
+    },
+    rawFeedback: {
+      warning: result.feedback.warning || null,
+      suggestions: result.feedback.suggestions ?? [],
+    },
   };
 }

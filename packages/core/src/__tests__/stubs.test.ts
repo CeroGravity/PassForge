@@ -1,14 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { evaluateStrength, generateFeedback, checkBreach } from "../index.js";
-
-describe("strength stub", () => {
-  it("returns placeholder score", () => {
-    const result = evaluateStrength("test");
-    expect(result.score).toBe(0);
-    expect(result.crackTimeSeconds).toBe(0);
-    expect(result.crackTimeDisplay).toBe("instant");
-  });
-});
+import { generateFeedback, checkBreach } from "../index.js";
 
 describe("feedback stub", () => {
   it("returns empty feedback", () => {

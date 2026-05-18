@@ -1,12 +1,16 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "StrengthTestVectors",
-  "description": "Test vectors for password strength evaluation across implementations.",
+  "description": "Language-neutral test vectors for password strength evaluation. Only portable, stable properties are asserted — see the README for the rationale.",
   "type": "array",
   "items": {
     "type": "object",
-    "required": ["input", "expected"],
+    "required": ["description", "input", "expected"],
     "properties": {
+      "description": {
+        "type": "string",
+        "description": "Human-readable label for the test case."
+      },
       "input": {
         "type": "object",
         "required": ["password"],
@@ -20,16 +24,21 @@
       },
       "expected": {
         "type": "object",
-        "required": ["score"],
+        "required": ["score", "crackTimeTier"],
         "properties": {
           "score": {
             "type": "integer",
             "minimum": 0,
             "maximum": 4,
             "description": "Expected strength score (0=weakest, 4=strongest)."
+          },
+          "crackTimeTier": {
+            "type": "string",
+            "enum": ["t0", "t1", "t2", "t3", "t4", "t5"],
+            "description": "Magnitude tier for the offline-slow-hashing crack-time. Neutral token for cross-implementation drift testing — NOT a human-facing label. See README for boundary definitions."
           }
         },
-        "additionalProperties": true
+        "additionalProperties": false
       }
     },
     "additionalProperties": false
