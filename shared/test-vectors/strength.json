@@ -1,0 +1,6 @@
+[
+  {
+    "input": { "password": "a" },
+    "expected": { "score": 0 }
+  }
+]

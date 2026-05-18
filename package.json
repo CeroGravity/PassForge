@@ -1,0 +1,25 @@
+{
+  "name": "passforge",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --build",
+    "lint": "eslint .",
+    "format:check": "prettier --check .",
+    "format": "prettier --write .",
+    "test": "vitest run --coverage",
+    "build": "pnpm -r run build"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.27.0",
+    "@vitest/coverage-v8": "3.2.1",
+    "eslint": "9.27.0",
+    "globals": "16.1.0",
+    "prettier": "3.5.3",
+    "typescript": "5.8.3",
+    "typescript-eslint": "8.32.1",
+    "vitest": "3.2.1"
+  },
+  "packageManager": "pnpm@11.1.2"
+}
