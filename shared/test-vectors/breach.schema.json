@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BreachTestVectors",
+  "description": "Language-neutral test vectors for the breach check layer. Unlike strength/feedback vectors, breach vectors assert EXACT SHA-1 values because SHA-1 is standardized and deterministic across all implementations.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["description", "input", "expected"],
+    "properties": {
+      "description": {
+        "type": "string",
+        "description": "Human-readable label for the test case."
+      },
+      "input": {
+        "type": "object",
+        "required": ["password"],
+        "properties": {
+          "password": {
+            "type": "string",
+            "description": "Synthetic test password (never use real credentials)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "expected": {
+        "type": "object",
+        "required": ["sha1", "prefix", "suffix"],
+        "properties": {
+          "sha1": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{40}$",
+            "description": "Full uppercase hex SHA-1 hash of the password."
+          },
+          "prefix": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{5}$",
+            "description": "First 5 hex characters of the SHA-1 hash (sent to HIBP)."
+          },
+          "suffix": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{35}$",
+            "description": "Remaining 35 hex characters (matched locally, never sent)."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "additionalProperties": false
+  }
+}

@@ -50,10 +50,81 @@ Instead, vectors assert only **portable, stable properties**:
    every such value sits at the geometric center of its tier, making vectors
    robust against minor cross-implementation numeric drift.
 
+## Feedback vectors — codes and severity only
+
+`feedback.json` vectors assert the **structured output** of the feedback layer:
+which `FindingCode` values must be present and what overall `severity` the score
+maps to. They deliberately do **not** assert the `action` message text, because:
+
+- Action wording is a UX concern that may be refined, A/B tested, or localized
+  without changing the underlying detection logic.
+- A future Python CLI will produce its own phrasing for the same codes.
+- Asserting exact strings would make every wording tweak a cross-implementation
+  breaking change, the same brittleness lesson learned with raw zxcvbn strings
+  in Phase 1.
+
+The contract is: given a password, the implementation must emit at least the
+listed codes at the listed severity. It may emit additional codes (e.g. extra
+character-class findings) — vectors use `codesPresent` (subset check), not an
+exact match.
+
+### Pattern derivation — optimal sequence only
+
+The `patterns` field on `StrengthResult` is extracted from zxcvbn's **optimal
+match sequence** (`result.sequence`), not from all candidate matches. The
+optimal sequence is the minimum-guesses decomposition that zxcvbn selects for
+scoring; it covers the full password without overlapping tokens.
+
+This means a password like `"qwerty"` may be classified as `"dictionary"` in
+one implementation (if "qwerty" exists in the loaded dictionary with fewer
+guesses than the spatial match) and `"spatial"` in another. Both are correct
+analyses — the difference is in which decomposition the implementation's
+scoring algorithm considers optimal.
+
+**Consequence for vectors:** feedback vectors must only assert pattern-derived
+codes (like `DICTIONARY_WORD`, `KEYBOARD_PATTERN`) when the optimal-sequence
+classification is unambiguous — i.e., when no competing pattern type could
+plausibly produce fewer guesses for that token. Codes derived from our own
+checks (length, character-class coverage) are always safe to assert because
+they do not depend on zxcvbn internals.
+
+Examples:
+
+- `"qwerty"` → vectors assert only `TOO_SHORT` (our own length check), not
+  `DICTIONARY_WORD` or `KEYBOARD_PATTERN`, because the optimal-sequence
+  pattern is implementation-variable for keyboard walks.
+- `"01/01/2000"` → vectors assert `DATE_PATTERN` because the date matcher
+  unambiguously covers the full token in separated `DD/MM/YYYY` form; no
+  competing decomposition yields fewer guesses.
+- `"aaaaaaaaaaaaaaaa"` → vectors assert `REPEAT_PATTERN` because no other
+  matcher produces a lower-guess single-token match for 16 identical chars.
+
+## Breach vectors — exact SHA-1 values
+
+Unlike strength and feedback vectors, `breach.json` asserts **exact values**:
+the full uppercase hex SHA-1 hash, the 5-character prefix, and the 35-character
+suffix for each test password. This is the correct approach here because:
+
+- SHA-1 is a standardized algorithm (FIPS 180-4) with deterministic, bit-exact
+  output. Every conforming implementation — TypeScript's Web Crypto, Python's
+  `hashlib`, Rust's `sha1` crate — produces identical hashes for identical input.
+- There is no implementation-variable scoring or heuristic involved, unlike
+  zxcvbn's strength estimation where internal dictionary ordering can cause
+  cross-implementation drift.
+- The exact prefix/suffix split is the load-bearing privacy contract: the
+  prefix (and only the prefix) leaves the client. Asserting exact values in
+  vectors ensures every implementation computes the same split and sends the
+  same prefix to the HIBP API.
+
+This means `breach.json` is the strictest cross-implementation contract in the
+project: a Python CLI that computes a different SHA-1 for the same password has
+a bug, not a drift tolerance issue.
+
 ## Structure
 
 Each JSON file in this directory contains an array of test cases following
-a consistent schema. See `strength.schema.json` for the canonical format.
+a consistent schema. See `strength.schema.json`, `feedback.schema.json`, and
+`breach.schema.json` for the canonical formats.
 
 ## Adding Vectors
 

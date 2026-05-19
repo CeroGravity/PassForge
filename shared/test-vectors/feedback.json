@@ -1,0 +1,74 @@
+[
+  {
+    "description": "empty string — maximum severity, length + variety findings",
+    "input": { "password": "" },
+    "expected": {
+      "minFindings": 1,
+      "codesPresent": ["TOO_SHORT"],
+      "severity": "crit"
+    }
+  },
+  {
+    "description": "common password 'password' — dictionary finding",
+    "input": { "password": "password" },
+    "expected": {
+      "minFindings": 1,
+      "codesPresent": ["DICTIONARY_WORD", "NO_UPPER", "NO_DIGIT", "NO_SYMBOL"],
+      "severity": "crit"
+    }
+  },
+  {
+    "description": "keyboard walk 'qwerty' — optimal-sequence pattern is impl-variable (dictionary or spatial), so assert only our own length check",
+    "input": { "password": "qwerty" },
+    "expected": {
+      "minFindings": 1,
+      "codesPresent": ["TOO_SHORT"],
+      "severity": "crit"
+    }
+  },
+  {
+    "description": "repeated characters — repeat pattern",
+    "input": { "password": "aaaaaaaaaaaaaaaa" },
+    "expected": {
+      "minFindings": 1,
+      "codesPresent": ["REPEAT_PATTERN"],
+      "severity": "crit"
+    }
+  },
+  {
+    "description": "sequential characters 'abcdef' — sequence pattern",
+    "input": { "password": "abcdef" },
+    "expected": {
+      "minFindings": 1,
+      "codesPresent": ["SEQUENCE_PATTERN", "TOO_SHORT"],
+      "severity": "crit"
+    }
+  },
+  {
+    "description": "date pattern '01/01/2000'",
+    "input": { "password": "01/01/2000" },
+    "expected": {
+      "minFindings": 1,
+      "codesPresent": ["DATE_PATTERN"],
+      "severity": "high"
+    }
+  },
+  {
+    "description": "mid-strength brute-force — variety findings only",
+    "input": { "password": "pJ5&wR3" },
+    "expected": {
+      "minFindings": 1,
+      "codesPresent": ["TOO_SHORT"],
+      "severity": "med"
+    }
+  },
+  {
+    "description": "score 4 strong passphrase — no findings",
+    "input": { "password": "correct horse battery staple" },
+    "expected": {
+      "minFindings": 0,
+      "codesPresent": [],
+      "severity": "info"
+    }
+  }
+]

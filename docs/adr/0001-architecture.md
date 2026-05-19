@@ -85,6 +85,50 @@ use normal clear prose and Conventional Commits format. This distinction exists
 because documentation must be readable by people who have never seen the
 CLAUDE.md, and commit messages must be self-explanatory in `git log`.
 
+### Pattern names extension (Phase 2)
+
+The feedback layer needs to know _why_ a password is weak (dictionary word,
+keyboard walk, repeated characters, etc.) without depending on zxcvbn's
+English warning/suggestion strings, which are localized, change between
+versions, and differ across implementations.
+
+zxcvbn's match-sequence exposes a `pattern` field on each match with stable
+machine identifiers: `"dictionary"`, `"spatial"`, `"repeat"`, `"sequence"`,
+`"regex"`, `"date"`, `"bruteforce"`, `"separator"`. These are structural
+labels defined by the algorithm, not English text — they are consistent
+across zxcvbn-ts, zxcvbn-python, and zxcvbn-rs.
+
+In Phase 2 the `StrengthResult` type was extended with a `patterns: MatchPattern[]`
+field containing the deduplicated set of pattern names found in the password.
+The feedback layer maps these to its own `FindingCode` enum (e.g.
+`"dictionary"` → `DICTIONARY_WORD`, `"spatial"` → `KEYBOARD_PATTERN`) and
+produces structured `Finding` objects with our own action wording, never
+passing through or branching on zxcvbn's English strings.
+
+**Derivation source: optimal sequence.** The `patterns` array is extracted from
+`result.sequence` — zxcvbn's optimal (minimum-guesses) match decomposition —
+not from all candidate matches. All-matches are not exposed by zxcvbn's public
+API. This means a token like "qwerty" may be classified as `"dictionary"` or
+`"spatial"` depending on which implementation's scoring algorithm considers
+optimal. Cross-implementation test vectors therefore only assert pattern-derived
+codes when the optimal-sequence classification is unambiguous (e.g. `DATE_PATTERN`
+for `"01/01/2000"`) and rely on our own checks (length, character classes) for
+implementation-variable cases like keyboard walks.
+
+### Runtime validation at the HIBP boundary (Phase 3)
+
+The CLAUDE.md tooling substitutions table notes that TypeScript interfaces
+provide structural typing but no runtime validation. For internal data flowing
+between `strength/` → `feedback/` this is acceptable — both sides are our code
+and type-checked at build time.
+
+The HIBP API response, however, is **untrusted external input** — the only
+system boundary where runtime validation is mandatory. In Phase 3, the breach
+module implements strict line-by-line validation of the HIBP response body:
+each line must match `/^[0-9A-F]{35}:\d+$/` or it is silently skipped. This
+is the deferred runtime-validation boundary noted in the original `pydantic`
+substitution row: validation is now in place exactly where it is needed.
+
 ## Consequences
 
 - Phase 0 produces a buildable, type-safe skeleton with all gates passing.

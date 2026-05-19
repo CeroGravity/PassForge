@@ -27,17 +27,57 @@ That is the **complete** list. Nothing else is transmitted.
 
 ## How the HIBP k-anonymity check works
 
-1. The password is hashed locally using SHA-1.
-2. The first 5 hex characters of the hash (the "prefix") are sent to
-   `GET https://api.pwnedpasswords.com/range/{prefix}`.
-3. The API returns all hash suffixes that match that prefix, along with breach
-   counts.
-4. PassForge checks locally whether the full hash appears in the returned list.
-5. The API operator sees only a 5-character prefix, which maps to hundreds of
+1. The password is hashed locally using SHA-1 via Web Crypto
+   (`globalThis.crypto.subtle.digest("SHA-1", ...)`). The hash is converted to
+   40 uppercase hex characters.
+2. The hash is split into a **prefix** (first 5 characters) and a **suffix**
+   (remaining 35 characters). Only the prefix ever leaves the client.
+3. A single GET request is sent:
+   ```
+   GET https://api.pwnedpasswords.com/range/{prefix}
+   Headers: Add-Padding: true
+   ```
+4. The API returns all hash suffixes that match that prefix, along with breach
+   counts, in the format `SUFFIX:COUNT` (one per line, CRLF-separated).
+5. PassForge checks locally whether the suffix appears in the returned list.
+   If found, the associated count is returned as a "breached" result.
+6. The API operator sees only a 5-character prefix, which maps to hundreds of
    possible hashes — they cannot determine which password was checked.
 
 This is the same k-anonymity model used by 1Password, Firefox Monitor, and
 other password-checking tools.
+
+### SHA-1 for HIBP compatibility
+
+SHA-1 is used **solely** because the HIBP Pwned Passwords API requires it as
+the hash function for its k-anonymity range lookup protocol. SHA-1 is not used
+as a security primitive in PassForge. The security of the breach check does not
+depend on SHA-1's collision resistance — it depends on the k-anonymity property:
+only a 5-character prefix (one of 16^5 = 1,048,576 possible prefixes) is ever
+transmitted, making it computationally infeasible to determine which password
+was checked.
+
+### Add-Padding header
+
+The `Add-Padding: true` request header instructs the HIBP API to pad its
+response with dummy entries (having a count of 0). This ensures that every
+response has a similar size, defeating response-size correlation attacks where
+an observer could infer information about the queried prefix from the byte
+length of the API response. PassForge always sends this header.
+
+### Exact request shape
+
+For a password whose SHA-1 hash begins with `5BAA6`:
+
+```
+GET /range/5BAA6 HTTP/1.1
+Host: api.pwnedpasswords.com
+Add-Padding: true
+```
+
+No other data is included in the request. There is no request body. The suffix,
+the full hash, and the password itself never appear in the URL, headers, or
+body of any outgoing request.
 
 ## User-Agent header
 

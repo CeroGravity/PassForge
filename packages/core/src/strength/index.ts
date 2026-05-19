@@ -22,10 +22,32 @@ export interface CrackTimesSeconds {
   offlineFastHashing: number;
 }
 
+/**
+ * Stable zxcvbn match-sequence pattern identifiers.
+ * These are cross-version/cross-implementation stable names, unlike
+ * zxcvbn's English warning/suggestion strings. Used by the feedback
+ * layer (Phase 2) to derive structured findings.
+ */
+export type MatchPattern =
+  | "dictionary"
+  | "spatial"
+  | "repeat"
+  | "sequence"
+  | "regex"
+  | "date"
+  | "bruteforce"
+  | "separator";
+
 export interface StrengthResult {
   score: 0 | 1 | 2 | 3 | 4;
   guesses: number;
   crackTimesSeconds: CrackTimesSeconds;
+  /**
+   * Deduplicated set of stable zxcvbn match-sequence pattern names found
+   * in the password. These are machine identifiers (e.g. "dictionary",
+   * "spatial"), NOT English strings. See ADR 0001 §"Pattern names extension".
+   */
+  patterns: MatchPattern[];
   /** Raw zxcvbn feedback — Phase 2 owns transformation into actionable UI feedback. */
   rawFeedback: {
     warning: string | null;
@@ -48,6 +70,7 @@ export function evaluateStrength(password: string): StrengthResult {
         offlineSlowHashing: 0,
         offlineFastHashing: 0,
       },
+      patterns: [],
       rawFeedback: { warning: null, suggestions: [] },
     };
   }
@@ -64,9 +87,14 @@ export function evaluateStrength(password: string): StrengthResult {
 
   const result = zxcvbn(password);
 
+  const patterns = [
+    ...new Set(result.sequence.map((m) => m.pattern)),
+  ] as MatchPattern[];
+
   return {
     score: result.score as 0 | 1 | 2 | 3 | 4,
     guesses: result.guesses,
+    patterns,
     crackTimesSeconds: {
       onlineThrottling: result.crackTimesSeconds.onlineThrottling100PerHour,
       onlineNoThrottling:

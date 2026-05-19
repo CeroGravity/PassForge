@@ -1,0 +1,38 @@
+[
+  {
+    "description": "common password 'password' — SHA-1 is deterministic and standardized",
+    "input": { "password": "password" },
+    "expected": {
+      "sha1": "5BAA61E4C9B93F3F0682250B6CF8331B7EE68FD8",
+      "prefix": "5BAA6",
+      "suffix": "1E4C9B93F3F0682250B6CF8331B7EE68FD8"
+    }
+  },
+  {
+    "description": "passphrase 'correct horse battery staple'",
+    "input": { "password": "correct horse battery staple" },
+    "expected": {
+      "sha1": "ABF7AAD6438836DBE526AA231ABDE2D0EEF74D42",
+      "prefix": "ABF7A",
+      "suffix": "AD6438836DBE526AA231ABDE2D0EEF74D42"
+    }
+  },
+  {
+    "description": "short password 'abc123'",
+    "input": { "password": "abc123" },
+    "expected": {
+      "sha1": "6367C48DD193D56EA7B0BAAD25B19455E529F5EE",
+      "prefix": "6367C",
+      "suffix": "48DD193D56EA7B0BAAD25B19455E529F5EE"
+    }
+  },
+  {
+    "description": "mixed-class password 'P@ssw0rd!'",
+    "input": { "password": "P@ssw0rd!" },
+    "expected": {
+      "sha1": "076D3E6C4B9F654B5B220B9045B7458AB6B4CBC6",
+      "prefix": "076D3",
+      "suffix": "E6C4B9F654B5B220B9045B7458AB6B4CBC6"
+    }
+  }
+]

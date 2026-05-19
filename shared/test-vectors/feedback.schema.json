@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FeedbackTestVectors",
+  "description": "Language-neutral test vectors for the feedback layer. Only stable structured fields (codes + severity) are asserted — NOT action message text. See README for rationale.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["description", "input", "expected"],
+    "properties": {
+      "description": {
+        "type": "string",
+        "description": "Human-readable label for the test case."
+      },
+      "input": {
+        "type": "object",
+        "required": ["password"],
+        "properties": {
+          "password": {
+            "type": "string",
+            "description": "Synthetic test password (never use real credentials)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "expected": {
+        "type": "object",
+        "required": ["minFindings", "codesPresent", "severity"],
+        "properties": {
+          "minFindings": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Minimum number of findings expected."
+          },
+          "codesPresent": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "TOO_SHORT",
+                "NO_UPPER",
+                "NO_LOWER",
+                "NO_DIGIT",
+                "NO_SYMBOL",
+                "KEYBOARD_PATTERN",
+                "REPEAT_PATTERN",
+                "SEQUENCE_PATTERN",
+                "DATE_PATTERN",
+                "DICTIONARY_WORD",
+                "LOW_GUESSES"
+              ]
+            },
+            "description": "Finding codes that MUST be present in the output."
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["info", "low", "med", "high", "crit"],
+            "description": "Expected overall severity (mapped from score)."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "additionalProperties": false
+  }
+}
