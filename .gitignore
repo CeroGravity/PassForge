@@ -3,6 +3,18 @@ dist/
 coverage/
 *.tsbuildinfo
 .DS_Store
+
+# Secrets and environment
 .env
 .env.*
 !.env.example
+
+# Editor / OS
+*.swp
+*.swo
+*~
+Thumbs.db
+
+# Build history (private, not committed)
+.buildhistory
+
