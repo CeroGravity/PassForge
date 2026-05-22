@@ -121,7 +121,8 @@ function sleep(ms: number): Promise<void> {
  * regex-valid lines seen, so the caller can distinguish "no match in a
  * well-formed response" from "garbage/empty 200".
  */
-function parseHibpResponse(
+/** @internal — exported for fuzz testing only */
+export function parseHibpResponse(
   body: string,
   suffix: string,
 ): { count: number; validLines: number } {

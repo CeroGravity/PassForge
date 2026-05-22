@@ -121,6 +121,13 @@ body {
   outline-offset: 2px;
 }
 
+.pf-length-warning {
+  margin-top: var(--pf-space-2);
+  font-size: var(--pf-text-xs);
+  color: var(--pf-high);
+  font-weight: 500;
+}
+
 /* -- Strength meter -- */
 
 .pf-meter {
@@ -440,6 +447,17 @@ body {
   color: var(--pf-gray-500);
   text-decoration: line-through;
   opacity: 0.6;
+}
+
+.pf-hash-suffix-visible {
+  color: var(--pf-gray-500);
+  text-decoration: none;
+  opacity: 1;
+}
+
+.pf-crack-scenario-detail {
+  font-size: var(--pf-text-xs);
+  opacity: 0.7;
 }
 
 .pf-sent-arrow {

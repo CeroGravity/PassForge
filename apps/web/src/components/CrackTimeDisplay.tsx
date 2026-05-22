@@ -33,7 +33,7 @@ export function CrackTimeDisplay({ crackTimes }: Props) {
               <span className="pf-crack-scenario">
                 {s.label}
                 <br />
-                <span style={{ fontSize: "var(--pf-text-xs)", opacity: 0.7 }}>
+                <span className="pf-crack-scenario-detail">
                   {s.description}
                 </span>
               </span>

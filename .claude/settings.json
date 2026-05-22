@@ -1,0 +1,44 @@
+{
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "allow": [
+      "Bash(pnpm install)",
+      "Bash(pnpm test)",
+      "Bash(pnpm test:web)",
+      "Bash(pnpm run typecheck)",
+      "Bash(pnpm run lint)",
+      "Bash(pnpm run format)",
+      "Bash(pnpm run format:check)",
+      "Bash(pnpm run build)",
+      "Bash(pnpm audit*)",
+      "Bash(vitest*)",
+      "Bash(eslint*)",
+      "Bash(prettier*)",
+      "Bash(tsc*)",
+      "Bash(vite*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git ls-files*)",
+      "Bash(ls *)",
+      "Bash(find *)",
+      "Bash(grep *)",
+      "Bash(cat *)",
+      "Bash(mkdir *)",
+      "Read(*)",
+      "Edit(*)",
+      "Write(*)"
+    ],
+    "deny": [
+      "Bash(rm *)",
+      "Bash(git push*)",
+      "Bash(git commit*)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(*~/.ssh*)",
+      "Bash(*~/.aws*)",
+      "Bash(*~/.config*)",
+      "Bash(*.env *)"
+    ]
+  }
+}

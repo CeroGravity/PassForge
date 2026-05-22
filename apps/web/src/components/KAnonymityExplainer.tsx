@@ -59,12 +59,7 @@ export function KAnonymityExplainer({ hash }: Props) {
             </div>
             <div className="pf-hash-row">
               <span className="pf-hash-label">Stays local:</span>
-              <span
-                className="pf-hash-suffix"
-                style={{ textDecoration: "none", opacity: 1 }}
-              >
-                {suffix}
-              </span>
+              <span className="pf-hash-suffix-visible">{suffix}</span>
               <span className="pf-kept-arrow">✕ never leaves your device</span>
             </div>
           </div>
