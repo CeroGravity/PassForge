@@ -129,6 +129,34 @@ each line must match `/^[0-9A-F]{35}:\d+$/` or it is silently skipped. This
 is the deferred runtime-validation boundary noted in the original `pydantic`
 substitution row: validation is now in place exactly where it is needed.
 
+### Coverage scope: apps/web (Phase 4)
+
+The root `vitest.config.ts` coverage gate (`packages/*/src/**/*.ts`, 80%
+thresholds) measures `packages/core` — the deterministic logic layer where
+every branch has a meaningful correctness implication. This gate remains real
+and enforced.
+
+`apps/web` is a React presentation layer. Applying the same line-coverage gate
+here would incentivize shallow tests (snapshot dumps, trivial render checks)
+that inflate numbers without catching real bugs. Instead, `apps/web` requires
+**behavioral tests for the 5 safety-relevant UI paths**:
+
+1. **Unavailable ≠ safe** — breach "unavailable" renders with `data-status="unavailable"`,
+   visually and semantically distinct from "safe"; text explicitly warns the user.
+2. **Crack-time from raw seconds** — UI displays crack-time text derived from
+   `crackTimesSeconds`, never from t0–t5 tiers; tier strings absent from DOM.
+3. **No sensitive storage** — spies on `localStorage.setItem`, `localStorage.getItem`,
+   `sessionStorage` (via Storage.prototype), `document.cookie` setter, and
+   `indexedDB.open` confirm zero calls during a full analysis + breach check flow.
+4. **K-anonymity explainer present** — the explainer mentions k-anonymity, states
+   only 5 characters are sent, states remaining 35 never leave, mentions local
+   SHA-1 hashing, and renders the prefix/suffix visual.
+5. **Meter reflects core score** — "Very weak" / 0 for weak input, "Strong" / 4
+   for strong input; meter segments activate according to score.
+
+These tests run in jsdom via `apps/web/vitest.config.ts` (separate from the
+root config) and are NOT included in the root coverage thresholds.
+
 ## Consequences
 
 - Phase 0 produces a buildable, type-safe skeleton with all gates passing.

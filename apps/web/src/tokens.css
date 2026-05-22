@@ -1,0 +1,96 @@
+/* ============================================================
+   PassForge Design Tokens
+   Single source of truth — no ad-hoc colors/sizes anywhere.
+   ============================================================ */
+
+:root {
+  /* -- Color: base palette -- */
+  --pf-gray-50: #f8f9fa;
+  --pf-gray-100: #e9ecef;
+  --pf-gray-200: #dee2e6;
+  --pf-gray-300: #ced4da;
+  --pf-gray-400: #adb5bd;
+  --pf-gray-500: #6c757d;
+  --pf-gray-600: #495057;
+  --pf-gray-700: #343a40;
+  --pf-gray-800: #212529;
+  --pf-gray-900: #16191d;
+
+  /* -- Color: semantic -- */
+  --pf-bg: var(--pf-gray-900);
+  --pf-bg-card: #1c2026;
+  --pf-bg-input: #252a31;
+  --pf-text: #e4e7eb;
+  --pf-text-muted: var(--pf-gray-400);
+  --pf-text-heading: #ffffff;
+  --pf-border: var(--pf-gray-700);
+  --pf-focus-ring: #6ea8fe;
+
+  /* -- Color: severity (WCAG AA on dark bg) -- */
+  --pf-crit: #f87171;
+  --pf-crit-bg: rgba(248, 113, 113, 0.1);
+  --pf-high: #fb923c;
+  --pf-high-bg: rgba(251, 146, 60, 0.1);
+  --pf-med: #facc15;
+  --pf-med-bg: rgba(250, 204, 21, 0.08);
+  --pf-low: #4ade80;
+  --pf-low-bg: rgba(74, 222, 128, 0.08);
+  --pf-info: #60a5fa;
+  --pf-info-bg: rgba(96, 165, 250, 0.08);
+
+  /* -- Color: breach states -- */
+  --pf-breached: var(--pf-crit);
+  --pf-breached-bg: var(--pf-crit-bg);
+  --pf-safe: #34d399;
+  --pf-safe-bg: rgba(52, 211, 153, 0.1);
+  --pf-unavailable: var(--pf-gray-400);
+  --pf-unavailable-bg: rgba(173, 181, 189, 0.08);
+
+  /* -- Type scale -- */
+  --pf-font: "Inter", system-ui, -apple-system, sans-serif;
+  --pf-font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --pf-text-xs: 0.75rem;
+  --pf-text-sm: 0.875rem;
+  --pf-text-base: 1rem;
+  --pf-text-lg: 1.125rem;
+  --pf-text-xl: 1.25rem;
+  --pf-text-2xl: 1.5rem;
+  --pf-text-3xl: 2rem;
+
+  /* -- Spacing -- */
+  --pf-space-1: 0.25rem;
+  --pf-space-2: 0.5rem;
+  --pf-space-3: 0.75rem;
+  --pf-space-4: 1rem;
+  --pf-space-5: 1.25rem;
+  --pf-space-6: 1.5rem;
+  --pf-space-8: 2rem;
+  --pf-space-10: 2.5rem;
+  --pf-space-12: 3rem;
+
+  /* -- Radius -- */
+  --pf-radius-sm: 0.375rem;
+  --pf-radius-md: 0.5rem;
+  --pf-radius-lg: 0.75rem;
+  --pf-radius-full: 9999px;
+
+  /* -- Motion (reduced-motion overridden below) -- */
+  --pf-transition-fast: 150ms ease;
+  --pf-transition-base: 250ms ease;
+  --pf-transition-slow: 400ms ease;
+
+  /* -- Meter score stops -- */
+  --pf-meter-0: var(--pf-crit);
+  --pf-meter-1: var(--pf-high);
+  --pf-meter-2: var(--pf-med);
+  --pf-meter-3: var(--pf-low);
+  --pf-meter-4: var(--pf-info);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --pf-transition-fast: 0ms;
+    --pf-transition-base: 0ms;
+    --pf-transition-slow: 0ms;
+  }
+}
